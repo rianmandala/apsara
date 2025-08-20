@@ -14,6 +14,7 @@ interface FormItemDynamicListProps {
     add: () => void;
     addBtnText: string;
     addBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+    removeBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
 }
 
 interface DynamicListProps {
@@ -21,6 +22,7 @@ interface DynamicListProps {
     meta: any;
     addBtnText?: string;
     addBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+    removeBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
 }
 
 const FormItemDynamicList = ({
@@ -31,6 +33,7 @@ const FormItemDynamicList = ({
     formListfields,
     addBtnText,
     addBtnProps,
+    removeBtnProps,
 }: FormItemDynamicListProps) => {
     // ? We need to do this because we can't set value and initialValue for form.list items from config
     useEffect(() => {
@@ -69,14 +72,21 @@ const FormItemDynamicList = ({
                 return (
                     <div key={field.key} className="form-dynamic-list__item">
                         <FormBuilder.Items index={index} form={form} meta={{ ...meta, fields }} />
-                        <Icon
+                        <button
+                            type="button"
+                            role="presentation"
                             className="form-dynamic-list__btn-remove"
-                            name="remove"
-                            active
-                            color="#dc3545"
-                            disabled={isDisabled}
-                            onClick={() => !isDisabled && remove(field.name)}
-                        />
+                            disabled={isDisabled || removeBtnProps?.disabled}
+                            onClick={() => !isDisabled && !removeBtnProps?.disabled && remove(field.name)}
+                            {...removeBtnProps}
+                        >
+                            <Icon
+                                name="remove"
+                                active
+                                color="#dc3545"
+                                disabled={isDisabled || removeBtnProps?.disabled}
+                            />
+                        </button>
                     </div>
                 );
             })}
@@ -96,7 +106,7 @@ const FormItemDynamicList = ({
     );
 };
 
-export const DynamicList = ({ form, meta, addBtnText = "Add", addBtnProps }: DynamicListProps) => {
+export const DynamicList = ({ form, meta, addBtnText = "Add", addBtnProps, removeBtnProps }: DynamicListProps) => {
     return (
         <List name={meta.name}>
             {(formListfields, { add, remove }) => (
@@ -108,6 +118,7 @@ export const DynamicList = ({ form, meta, addBtnText = "Add", addBtnProps }: Dyn
                     formListfields={formListfields}
                     addBtnText={addBtnText}
                     addBtnProps={addBtnProps}
+                    removeBtnProps={removeBtnProps}
                 />
             )}
         </List>
