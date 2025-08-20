@@ -23,6 +23,7 @@ export const Form: FC = () => {
 
     const meta = {
         name: ["policies"],
+        disabled: () => true,
         fields: [
             {
                 key: "account_type",
