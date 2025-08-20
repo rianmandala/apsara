@@ -6,6 +6,15 @@ import { List } from "rc-field-form";
 import { Field, getFormListItemFields } from "./helper";
 import { DynamicListContainer } from "./DynamicList.styles";
 
+interface RemoveBtnOnClick {
+    event?: React.MouseEvent<HTMLButtonElement>;
+    index?: number;
+}
+
+type RemoveBtnProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
+    onClick?: (props?: RemoveBtnOnClick) => void;
+};
+
 interface FormItemDynamicListProps {
     form: any;
     meta: any;
@@ -14,7 +23,7 @@ interface FormItemDynamicListProps {
     add: () => void;
     addBtnText: string;
     addBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
-    removeBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+    removeBtnProps?: RemoveBtnProps;
 }
 
 interface DynamicListProps {
@@ -22,7 +31,7 @@ interface DynamicListProps {
     meta: any;
     addBtnText?: string;
     addBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
-    removeBtnProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+    removeBtnProps?: RemoveBtnProps;
 }
 
 const FormItemDynamicList = ({
@@ -77,8 +86,15 @@ const FormItemDynamicList = ({
                             role="presentation"
                             className="form-dynamic-list__btn-remove"
                             disabled={isDisabled || removeBtnProps?.disabled}
-                            onClick={() => !isDisabled && !removeBtnProps?.disabled && remove(field.name)}
                             {...removeBtnProps}
+                            onClick={(e) => {
+                                if (!isDisabled && !removeBtnProps?.disabled) {
+                                    remove(field.name);
+                                    if (removeBtnProps?.onClick) {
+                                        removeBtnProps.onClick({ event: e, index });
+                                    }
+                                }
+                            }}
                         >
                             <Icon
                                 name="remove"
@@ -93,11 +109,14 @@ const FormItemDynamicList = ({
             <button
                 type="button"
                 role="presentation"
-                onClick={() => {
-                    add();
-                }}
                 className="form-dynamic-list__btn-add"
                 {...addBtnProps}
+                onClick={(e) => {
+                    add();
+                    if (addBtnProps?.onClick) {
+                        addBtnProps.onClick(e);
+                    }
+                }}
             >
                 <Icon name="add" active={!addBtnProps?.disabled} />
                 {addBtnText}
