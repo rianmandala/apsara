@@ -23,6 +23,9 @@
         "cjs",
         "esm"
     ],
+    "publishConfig": {
+        "access": "public"
+    },
     "repository": {
         "type": "git",
         "url": "git+ssh://git@github.com/goto/apsara.git"

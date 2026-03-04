@@ -17,7 +17,11 @@
         "build-storybook": "build-storybook -o public -s ./.storybook/images",
         "test": "turbo run test",
         "lint": "turbo run lint",
-        "lint:fix": "lerna run lint:fix"
+        "lint:fix": "lerna run lint:fix",
+        "release": "yarn build && yarn release:publish",
+        "release:publish": "lerna publish from-package --no-verify-access --yes",
+        "release:icons": "cd packages/apsara-icons && npm publish",
+        "release:apsara": "cd packages/apsara-ui && npm publish"
     },
     "devDependencies": {
         "@babel/core": "^7.11.6",
