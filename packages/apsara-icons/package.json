@@ -1,6 +1,6 @@
 {
     "name": "@old-goto-company/icons",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Apsara icons",
     "scripts": {
         "build": "node scripts/build.js",
@@ -17,7 +17,9 @@
             "import": "./esm/index.js",
             "require": "./cjs/index.js",
             "types": "./cjs/index.d.ts"
-        }
+        },
+        "./cjs/*": "./cjs/*.js",
+        "./esm/*": "./esm/*.js"
     },
     "files": [
         "cjs",
