@@ -1,8 +1,9 @@
-import React from "react";
-import { SelectProps, OptGroup, Option } from "rc-select";
+import React, { forwardRef, HTMLAttributes } from "react";
+import Select, { SelectProps, OptGroup, Option } from "rc-select";
 import { NotFoundContent, StyledMultiSelect } from "./Combobox.styles";
 import { useState } from "react";
 import Icon from "../Icon";
+import { CustomTagProps } from "rc-select/lib/interface/generator";
 
 const SearchIcon = <Icon name="search" size={20} color="#aaa" />;
 const ArrowIcon = <Icon name="chevronright" color="#aaa" />;
@@ -20,22 +21,49 @@ const loadingContent = (
     </NotFoundContent>
 );
 
-const Combobox = ({
-    options,
-    mode,
-    value,
-    onChange,
-    onSearch,
-    onSelect,
-    onDeselect,
-    allowClear = true,
-    showSearch = true,
-    showArrow = true,
-    filterOption = true,
-    placeholder,
-    optionFilterProp,
-    ...props
-}: SelectProps) => {
+type CustomTagRenderProps = CustomTagProps &
+    HTMLAttributes<HTMLSpanElement> & {
+        isError?: boolean;
+    };
+
+export const CustomTagRender = (props: CustomTagRenderProps) => {
+    const { label, closable, onClose, isError, className = "", ...restProps } = props;
+
+    return (
+        <span className={`rc-select-selection-item ${className} ${isError ? "error" : ""}`} {...restProps}>
+            <span className="rc-select-selection-item-content">{label}</span>
+            {closable && (
+                <span
+                    className="rc-select-selection-item-remove"
+                    unselectable="on"
+                    aria-hidden="true"
+                    style={{ userSelect: "none" }}
+                    onClick={onClose}
+                >
+                    <span className="rc-select-selection-item-remove-icon">×</span>
+                </span>
+            )}
+        </span>
+    );
+};
+
+const Combobox = forwardRef<Select<unknown>, SelectProps>((props, ref) => {
+    const {
+        options,
+        mode,
+        value,
+        onChange,
+        onSearch,
+        onSelect,
+        onDeselect,
+        allowClear = true,
+        showSearch = true,
+        showArrow = true,
+        filterOption = true,
+        placeholder,
+        optionFilterProp,
+        ...restProps
+    } = props;
     const [showInputIcon, setShowInputIcon] = useState(true);
     const [isValue, setIsValue] = useState(false);
     const [inputIcon, setInputIcon] = useState(ArrowIcon);
@@ -73,8 +101,8 @@ const Combobox = ({
 
     return (
         <StyledMultiSelect
-            notFoundContent={props.loading ? loadingContent : notFoundContent}
-            {...props}
+            notFoundContent={restProps.loading ? loadingContent : notFoundContent}
+            {...restProps}
             showInputIcon={showInputIcon || !allowClear}
             showSearch={showSearch}
             mode={mode}
@@ -93,13 +121,15 @@ const Combobox = ({
             filterOption={filterOption}
             optionFilterProp={optionFilterProp || "value"}
             animation="slide"
+            ref={ref}
         >
-            {props.children}
+            {restProps.children}
         </StyledMultiSelect>
     );
-};
+});
 
-Combobox.Option = Option;
-Combobox.OptGroup = OptGroup;
+Combobox.displayName = "Combobox";
 
-export default Combobox;
+const CompoundCombobox = Object.assign(Combobox, { Option, OptGroup });
+
+export default CompoundCombobox;

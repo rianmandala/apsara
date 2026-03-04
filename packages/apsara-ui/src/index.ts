@@ -10,10 +10,12 @@ import Text from "./Text";
 import Tag from "./Tag";
 import States from "./States";
 import FormBuilder, { Form, FormInstance } from "./FormBuilder";
+import FormBuilderV2 from "./form-builder-v2";
 import Learn from "./Learn";
 import Markdown from "./Markdown";
 import ContentLayout from "./ContentLayout";
 import Sidebar from "./Sidebar";
+import { SidebarV2, useSidebarV2Context } from "./SidebarV2";
 import Drawer from "./Drawer";
 import Header from "./Header";
 import { ListSkeleton, EditorSkeleton, DetailsSkeleton } from "./Skeleton";
@@ -32,7 +34,7 @@ import Input from "./Input";
 import Radio from "./Radio";
 import Checkbox from "./Checkbox";
 import Image from "./Image";
-import Combobox from "./Combobox";
+import Combobox, { CustomTagRender } from "./Combobox";
 import Select from "./Select";
 import Tile from "./Tile";
 import Switch from "./Switch";
@@ -71,6 +73,7 @@ export {
     Text,
     Tag,
     FormBuilder,
+    FormBuilderV2,
     FormInstance,
     Form,
     States,
@@ -78,6 +81,8 @@ export {
     Markdown,
     ContentLayout,
     Sidebar,
+    SidebarV2,
+    useSidebarV2Context,
     Drawer,
     Header,
     ListSkeleton,
@@ -99,6 +104,7 @@ export {
     Image,
     Select,
     Combobox,
+    CustomTagRender,
     Tile,
     Switch,
     Slider,
