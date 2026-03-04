@@ -2604,11 +2604,6 @@
     "@floating-ui/dom" "^0.5.3"
     use-isomorphic-layout-effect "^1.1.1"
 
-"@goto-company/icons@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.npmjs.org/@goto-company/icons/-/icons-0.1.0.tgz#11a9d6537d4bc19a432924f7a40c60a4d2dbfbcd"
-  integrity sha512-8+gRNfxBQqMK40qwHCnROuc2SE39j0ypoUhkeDULhnWLDBMdg0giAKJRuumJM5Q2EISo54D/9mWc/bAvIFvIqA==
-
 "@hookform/error-message@2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@hookform/error-message/-/error-message-2.0.1.tgz#6a37419106e13664ad6a29c9dae699ae6cd276b8"
