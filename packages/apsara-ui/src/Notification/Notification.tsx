@@ -45,22 +45,24 @@ const uuid = () => {
 
 const defaultIcon = <Icon name="checkcircle" color="green" size={32} />;
 
-const sanitizeHtml = (html: string): string => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    doc.querySelectorAll("script, style, iframe, object, embed").forEach((el) => el.remove());
-    doc.querySelectorAll("*").forEach((el) => {
-        Array.from(el.attributes).forEach((attr) => {
-            if (/^on/i.test(attr.name) || (attr.name === "href" && /^javascript:/i.test(attr.value))) {
-                el.removeAttribute(attr.name);
-            }
-        });
-    });
-    return doc.body.innerHTML;
-};
+const URL_SPLIT_REGEX = /(https?:\/\/[^\s]+)/g;
+const URL_TEST_REGEX = /^https?:\/\/[^\s]+$/;
 
-const stripHtml = (html: string): string => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent ?? "";
+const renderTextWithLinks = (text: string): ReactNode => {
+    const parts = text.split(URL_SPLIT_REGEX);
+    return (
+        <>
+            {parts.map((part, i) =>
+                URL_TEST_REGEX.test(part) ? (
+                    <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+                        {part}
+                    </a>
+                ) : (
+                    part
+                ),
+            )}
+        </>
+    );
 };
 
 interface NotificationToastProps {
@@ -81,8 +83,7 @@ const NotificationToast = ({ notification, onOpenChange }: NotificationToastProp
     const isStringContent = typeof notification.content === "string";
 
     const handleCopy = useCallback(() => {
-        const raw = isStringContent ? String(notification.content) : "";
-        const text = raw.includes("<") ? stripHtml(raw) : raw;
+        const text = isStringContent ? String(notification.content) : "";
         navigator.clipboard.writeText(text).then(() => {
             setCopied(true);
             if (timerRef.current) clearTimeout(timerRef.current);
@@ -95,10 +96,7 @@ const NotificationToast = ({ notification, onOpenChange }: NotificationToastProp
 
     const renderContent = () => {
         if (isStringContent) {
-            const raw = String(notification.content);
-            if (raw.includes("<")) {
-                return <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(raw) }} />;
-            }
+            return renderTextWithLinks(String(notification.content));
         }
         return <>{notification.content}</>;
     };

@@ -32,8 +32,8 @@ const _Notifications = () => {
                 onClick={() => {
                     showError(
                         "Error",
-                        "user with email \"rian.putra01@gojek.com\" doesent have alicloud account. please refer into section 'A': <a href='https://gotocompany.sg.larksuite.com/docx/Izd4dNxLmosOSdx0dw0lXt0lgif?302from=wiki' target='_blank'>Goto AliCloud Handbook</a>",
-                        6000,
+                        `user with email "idil.amir@tokopedia.com" doesent have alicloud account. please refer into section 'A': https://gotocompany.sg.larksuite.com/docx/Izd4dNxLmosOSdx0dw0lXt0lgif?302from=wiki`,
+                        60000,
                     );
                 }}
             >

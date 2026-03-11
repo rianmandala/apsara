@@ -104,9 +104,6 @@ const StyledAction = styled(ToastPrimitive.Action)`
 `;
 
 export const DescriptionWrapper = styled("div")`
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
     padding-left: 15px;
     gap: 10px;
     margin-bottom: 5px;
