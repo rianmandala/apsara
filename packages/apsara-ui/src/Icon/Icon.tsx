@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { ThemeContext } from "styled-components";
 import { IconWrapper } from "./Icon.styles";
-import * as Icons from "@old-goto-company/icons";
+import * as Icons from "@ods-experience/icons";
 
 export type IconName = keyof typeof Icons;
 export interface CustomIconProps {

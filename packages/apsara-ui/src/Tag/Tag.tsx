@@ -1,6 +1,6 @@
 import React, { useState, ReactNode } from "react";
 import { StyledTag, TagWrapper } from "./Tag.styles";
-import * as Icons from "@old-goto-company/icons";
+import * as Icons from "@ods-experience/icons";
 import Colors from "../Colors";
 
 const Cross = Icons["cross"];
