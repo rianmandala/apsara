@@ -15,6 +15,7 @@ const StyledViewport = styled(ToastPrimitive.Viewport)`
     gap: 10px;
     width: max-content;
     max-width: 450px;
+    min-width: 450px;
     margin: 0;
     list-style: none;
     z-index: 2147483647;

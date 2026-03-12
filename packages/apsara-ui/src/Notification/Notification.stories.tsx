@@ -41,7 +41,7 @@ const _Notifications = () => {
             </Button>
             <Button
                 onClick={() => {
-                    showWarning("warning", "this is a test warning");
+                    showWarning("warning", "this", 60000);
                 }}
             >
                 show Warning
