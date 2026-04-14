@@ -29,6 +29,8 @@ const Tooltip = ({
     avoidCollisions,
     ...props
 }: TooltipProps) => {
+    if (!title) return null;
+
     return (
         <RadixTooltip.Provider delayDuration={delayDuration}>
             <RadixTooltip.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>

@@ -28,6 +28,7 @@ export interface Notifier {
     showSuccess: (title: ReactNode, content?: ReactNode, duration?: number) => void;
     showError: (title: ReactNode, content?: ReactNode, duration?: number) => void;
     showWarning: (title: ReactNode, content?: ReactNode, duration?: number) => void;
+    showAPIError: (error: unknown | unknown[]) => void;
 }
 
 export const useNotification = () => {
@@ -44,6 +45,94 @@ const uuid = () => {
 };
 
 const defaultIcon = <Icon name="checkcircle" color="green" size={32} />;
+
+const getAPIResponseMessage = (err: unknown): string | null => {
+    if (!err || typeof err !== "object") return null;
+    const e = err as Record<string, unknown>;
+    const data = ((e?.response as Record<string, unknown>)?.data ?? {}) as Record<string, unknown>;
+    if (typeof data?.message === "string" && data.message.trim()) return data.message;
+    const nested = (data?.error ?? {}) as Record<string, unknown>;
+    if (typeof nested?.message === "string" && nested.message.trim()) return nested.message;
+    return null;
+};
+
+const getAPIRequestUrl = (err: unknown): string | null => {
+    if (!err || typeof err !== "object") return null;
+    const e = err as Record<string, unknown>;
+    const configUrl = ((e?.config as Record<string, unknown>)?.url as string) ?? null;
+    const responseUrl = ((e?.request as Record<string, unknown>)?.responseURL as string) ?? null;
+    return configUrl || responseUrl || null;
+};
+
+const getAPIStatusCode = (err: unknown): number | null => {
+    if (!err || typeof err !== "object") return null;
+    const e = err as Record<string, unknown>;
+    const statusFromResponse = (e?.response as Record<string, unknown>)?.status as number | undefined;
+    const topLevelStatus = (e?.status as number | undefined) ?? undefined;
+    return typeof statusFromResponse === "number"
+        ? statusFromResponse
+        : typeof topLevelStatus === "number"
+        ? topLevelStatus
+        : null;
+};
+
+const isAPIError = (err: unknown): boolean => {
+    if (!err || typeof err !== "object") return false;
+    const e = err as Record<string, unknown>;
+    return !!(e.response || e.request || (e.config && typeof (e.config as Record<string, unknown>).url === "string"));
+};
+
+const buildAPIErrorContent = (errors: unknown[]): ReactNode => {
+    const withMessage = errors.filter((e) => getAPIResponseMessage(e));
+    const withoutMessage = errors.filter((e) => !getAPIResponseMessage(e));
+
+    const messageItems = withMessage.map(getAPIResponseMessage) as string[];
+
+    // Build objects containing url and status for entries without a response message
+    const failingUrlInfos = withoutMessage
+        .map((e) => ({ url: getAPIRequestUrl(e), status: getAPIStatusCode(e) }))
+        .filter((info) => info.url) as { url: string; status: number | null }[];
+
+    const unknownCount = withoutMessage.filter((e) => !getAPIRequestUrl(e)).length;
+
+    return (
+        <>
+            {messageItems.length > 0 && (
+                <div>
+                    {messageItems.map((msg, i) => (
+                        <div key={i}>{msg}</div>
+                    ))}
+                </div>
+            )}
+            {(failingUrlInfos.length > 0 || unknownCount > 0) && (
+                <div style={{ marginTop: messageItems.length > 0 ? "8px" : undefined }}>
+                    <div>
+                        {`The following API endpoint${
+                            failingUrlInfos.length + unknownCount > 1 ? "s" : ""
+                        } failed to respond with an error message:`}
+                    </div>
+                    <ul style={{ margin: "4px 0 0 0", paddingLeft: "16px" }}>
+                        {failingUrlInfos.map((info, i) => (
+                            <li key={i}>
+                                {info.status && (
+                                    <>
+                                        <code>{info.status}</code> {" - "}
+                                    </>
+                                )}{" "}
+                                <code>{info.url}</code>
+                            </li>
+                        ))}
+                        {unknownCount > 0 && (
+                            <li>
+                                {unknownCount} unknown endpoint{unknownCount > 1 ? "s" : ""} (no URL available)
+                            </li>
+                        )}
+                    </ul>
+                </div>
+            )}
+        </>
+    );
+};
 
 const URL_SPLIT_REGEX = /(https?:\/\/[^\s]+)/g;
 const URL_TEST_REGEX = /^https?:\/\/[^\s]+$/;
@@ -195,14 +284,48 @@ export const NotificationProvider = ({ children }: any) => {
         [setNotifications],
     );
 
+    const showAPIError = useCallback(
+        (error: unknown | unknown[]) => {
+            const errors = Array.isArray(error) ? error : [error];
+            const hasAPIError = errors.some(isAPIError);
+
+            if (!hasAPIError) {
+                const first = errors[0];
+                let message: ReactNode = "An unexpected error occurred.";
+                if (first instanceof Error && first.message) {
+                    message = first.message;
+                } else if (typeof first === "string" && first.trim()) {
+                    message = first;
+                }
+                showError("Something went wrong", message);
+                return;
+            }
+
+            const content = buildAPIErrorContent(errors);
+            setNotifications((prev) => [
+                ...prev,
+                {
+                    title: "API Request Failed",
+                    content,
+                    id: uuid(),
+                    duration: 8000,
+                    showCopy: false,
+                    icon: <Icon name="error" color="red" size={32} />,
+                },
+            ]);
+        },
+        [setNotifications, showError],
+    );
+
     const contextValue = useMemo(
         () => ({
             showNotification,
             showSuccess,
             showError,
             showWarning,
+            showAPIError,
         }),
-        [showNotification, showSuccess, showError, showWarning],
+        [showNotification, showSuccess, showError, showWarning, showAPIError],
     );
 
     return (
@@ -233,6 +356,9 @@ const NotificationContext = createContext<Notifier>({
         throw new Error("NotificationProvider is not initialized");
     },
     showWarning: () => {
+        throw new Error("NotificationProvider is not initialized");
+    },
+    showAPIError: () => {
         throw new Error("NotificationProvider is not initialized");
     },
 });
