@@ -46,6 +46,18 @@ const uuid = () => {
 
 const defaultIcon = <Icon name="checkcircle" color="green" size={32} />;
 
+const isGenericAxiosMessage = (msg: string) =>
+    /^Request failed with status code \d+$/.test(msg) || /^Network Error$/i.test(msg);
+
+const isAPIError = (err: unknown): boolean => {
+    if (!err || typeof err !== "object") return false;
+    const e = err as Record<string, unknown>;
+    // Axios always sets isAxiosError: true
+    if (e.isAxiosError === true) return true;
+    // Fallback structural check
+    return !!(e.response || e.request || (e.config && typeof (e.config as Record<string, unknown>).url === "string"));
+};
+
 const getAPIResponseMessage = (err: unknown): string | null => {
     if (!err || typeof err !== "object") return null;
     const e = err as Record<string, unknown>;
@@ -53,6 +65,9 @@ const getAPIResponseMessage = (err: unknown): string | null => {
     if (typeof data?.message === "string" && data.message.trim()) return data.message;
     const nested = (data?.error ?? {}) as Record<string, unknown>;
     if (typeof nested?.message === "string" && nested.message.trim()) return nested.message;
+    // Also skip generic Axios messages
+    const fallback = (e as Record<string, unknown>)?.message;
+    if (typeof fallback === "string" && !isGenericAxiosMessage(fallback)) return fallback;
     return null;
 };
 
@@ -76,10 +91,11 @@ const getAPIStatusCode = (err: unknown): number | null => {
         : null;
 };
 
-const isAPIError = (err: unknown): boolean => {
-    if (!err || typeof err !== "object") return false;
+const getAPIRequestMethod = (err: unknown): string | null => {
+    if (!err || typeof err !== "object") return null;
     const e = err as Record<string, unknown>;
-    return !!(e.response || e.request || (e.config && typeof (e.config as Record<string, unknown>).url === "string"));
+    const method = (e?.config as Record<string, unknown>)?.method as string | undefined;
+    return method ? method.toUpperCase() : null;
 };
 
 const buildAPIErrorContent = (errors: unknown[]): ReactNode => {
@@ -88,12 +104,15 @@ const buildAPIErrorContent = (errors: unknown[]): ReactNode => {
 
     const messageItems = withMessage.map(getAPIResponseMessage) as string[];
 
-    // Build objects containing url and status for entries without a response message
     const failingUrlInfos = withoutMessage
-        .map((e) => ({ url: getAPIRequestUrl(e), status: getAPIStatusCode(e) }))
-        .filter((info) => info.url) as { url: string; status: number | null }[];
+        .map((e) => ({ url: getAPIRequestUrl(e), status: getAPIStatusCode(e), method: getAPIRequestMethod(e) }))
+        .filter((info) => info.url || info.status) as {
+        url: string | null;
+        status: number | null;
+        method: string | null;
+    }[];
 
-    const unknownCount = withoutMessage.filter((e) => !getAPIRequestUrl(e)).length;
+    const unknownCount = withoutMessage.filter((e) => !getAPIRequestUrl(e) && !getAPIStatusCode(e)).length;
 
     return (
         <>
@@ -107,21 +126,24 @@ const buildAPIErrorContent = (errors: unknown[]): ReactNode => {
             {(failingUrlInfos.length > 0 || unknownCount > 0) && (
                 <div style={{ marginTop: messageItems.length > 0 ? "8px" : undefined }}>
                     <div>
-                        {`The following API endpoint${
+                        {`The server returned no error details. Failed API call${
                             failingUrlInfos.length + unknownCount > 1 ? "s" : ""
-                        } failed to respond with an error message:`}
+                        }:`}
                     </div>
                     <ul style={{ margin: "4px 0 0 0", paddingLeft: "16px" }}>
-                        {failingUrlInfos.map((info, i) => (
-                            <li key={i}>
-                                {info.status && (
-                                    <>
-                                        <code>{info.status}</code> {" - "}
-                                    </>
-                                )}{" "}
-                                <code>{info.url}</code>
-                            </li>
-                        ))}
+                        {failingUrlInfos.map((info, i) => {
+                            const label = [
+                                info.status ? String(info.status) : null,
+                                info.method && info.url ? `${info.method} ${info.url}` : info.url || info.method,
+                            ]
+                                .filter(Boolean)
+                                .join(" - ");
+                            return (
+                                <li key={i}>
+                                    <code>{label}</code>
+                                </li>
+                            );
+                        })}
                         {unknownCount > 0 && (
                             <li>
                                 {unknownCount} unknown endpoint{unknownCount > 1 ? "s" : ""} (no URL available)
