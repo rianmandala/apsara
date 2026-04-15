@@ -319,7 +319,7 @@ export const NotificationProvider = ({ children }: any) => {
                 } else if (typeof first === "string" && first.trim()) {
                     message = first;
                 }
-                showError("Something went wrong", message);
+                showError("Error", message);
                 return;
             }
 
@@ -331,7 +331,7 @@ export const NotificationProvider = ({ children }: any) => {
                     content,
                     id: uuid(),
                     duration: 8000,
-                    showCopy: false,
+                    showCopy: true,
                     icon: <Icon name="error" color="red" size={32} />,
                 },
             ]);
