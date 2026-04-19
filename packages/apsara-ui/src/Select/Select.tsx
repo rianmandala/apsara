@@ -48,7 +48,7 @@ export type SelectProps = {
     scrollButtonProps?: StyleProps;
     separatorProps?: StyleProps;
     itemProps?: StyleProps;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "onChange">;
 
 const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => {
     const {
@@ -60,7 +60,12 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => {
         defaultOpen = false,
         open,
         onOpenChange,
-        ...restProps
+        triggerProps,
+        contentProps,
+        scrollButtonProps,
+        separatorProps,
+        itemProps,
+        ...rest
     } = props;
     const lastInd = groups.length - 1;
     const [showDefaultItem, setShowDefaultItem] = useState(true);
@@ -77,72 +82,72 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => {
     }, []);
 
     return (
-        <SelectRoot
-            defaultValue={defaultValue}
-            value={value}
-            name={name}
-            onValueChange={(value) => {
-                if (value != "") setShowDefaultItem(false);
-                onChange && onChange(value);
-            }}
-            defaultOpen={defaultOpen}
-            open={open}
-            onOpenChange={onOpenChange}
-        >
-            <SelectTrigger
-                {...restProps.triggerProps}
-                className={`${PREFIX_CLS}-trigger ${
-                    restProps.triggerProps?.className ? restProps.triggerProps?.className : ""
-                }`}
-                ref={ref}
+        <div {...rest}>
+            <SelectRoot
+                defaultValue={defaultValue}
+                value={value}
+                name={name}
+                onValueChange={(value) => {
+                    if (value != "") setShowDefaultItem(false);
+                    onChange && onChange(value);
+                }}
+                defaultOpen={defaultOpen}
+                open={open}
+                onOpenChange={onOpenChange}
             >
-                <SelectValue />
-                <SelectIcon>
-                    <ChevronDownIcon />
-                </SelectIcon>
-            </SelectTrigger>
-            <SelectContent {...restProps.contentProps}>
-                <SelectScrollUpButton {...restProps.scrollButtonProps}>
-                    <ChevronUpIcon />
-                </SelectScrollUpButton>
-                <SelectViewport>
-                    {showDefaultItem && (
-                        <SelectItem value={value || defaultValue}>
-                            <SelectItemText>{value || defaultValue}</SelectItemText>
-                            <SelectItemIndicator>
-                                <CheckIcon />
-                            </SelectItemIndicator>
-                        </SelectItem>
-                    )}
-                    {groups.map((group: Group, i) => (
-                        <div key={i}>
-                            <SelectGroup>
-                                {group.label && <SelectLabel>{group.label}</SelectLabel>}
+                <SelectTrigger
+                    {...triggerProps}
+                    className={`${PREFIX_CLS}-trigger ${triggerProps?.className ? triggerProps?.className : ""}`}
+                    ref={ref}
+                >
+                    <SelectValue />
+                    <SelectIcon>
+                        <ChevronDownIcon />
+                    </SelectIcon>
+                </SelectTrigger>
+                <SelectContent {...contentProps}>
+                    <SelectScrollUpButton {...scrollButtonProps}>
+                        <ChevronUpIcon />
+                    </SelectScrollUpButton>
+                    <SelectViewport>
+                        {showDefaultItem && (
+                            <SelectItem value={value || defaultValue}>
+                                <SelectItemText>{value || defaultValue}</SelectItemText>
+                                <SelectItemIndicator>
+                                    <CheckIcon />
+                                </SelectItemIndicator>
+                            </SelectItem>
+                        )}
+                        {groups.map((group: Group, i) => (
+                            <div key={i}>
+                                <SelectGroup>
+                                    {group.label && <SelectLabel>{group.label}</SelectLabel>}
 
-                                {group.items.map((item: Item) => (
-                                    <SelectItem
-                                        key={item.value}
-                                        value={item.value}
-                                        disabled={item.disabled}
-                                        {...restProps.itemProps}
-                                    >
-                                        <SelectItemText>{item.displayText}</SelectItemText>
-                                        <SelectItemIndicator>
-                                            <CheckIcon />
-                                        </SelectItemIndicator>
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
+                                    {group.items.map((item: Item) => (
+                                        <SelectItem
+                                            key={item.value}
+                                            value={item.value}
+                                            disabled={item.disabled}
+                                            {...itemProps}
+                                        >
+                                            <SelectItemText>{item.displayText}</SelectItemText>
+                                            <SelectItemIndicator>
+                                                <CheckIcon />
+                                            </SelectItemIndicator>
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
 
-                            {i != lastInd && <SelectSeparator {...restProps.separatorProps} />}
-                        </div>
-                    ))}
-                </SelectViewport>
-                <SelectScrollDownButton {...restProps.scrollButtonProps}>
-                    <ChevronDownIcon />
-                </SelectScrollDownButton>
-            </SelectContent>
-        </SelectRoot>
+                                {i != lastInd && <SelectSeparator {...separatorProps} />}
+                            </div>
+                        ))}
+                    </SelectViewport>
+                    <SelectScrollDownButton {...scrollButtonProps}>
+                        <ChevronDownIcon />
+                    </SelectScrollDownButton>
+                </SelectContent>
+            </SelectRoot>
+        </div>
     );
 });
 

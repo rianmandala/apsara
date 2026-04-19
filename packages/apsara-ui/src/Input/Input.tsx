@@ -37,6 +37,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
     return (
         <StyledWrapper
+            {...(restProps as React.HTMLAttributes<HTMLDivElement>)}
             size={size}
             disabled={restProps.disabled}
             style={restProps.style}

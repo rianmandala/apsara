@@ -13,7 +13,7 @@ type DrawerProps = {
     children?: React.ReactNode;
     drawerStyle?: React.CSSProperties;
     drawerClassName?: string;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "style" | "className" | "children">;
 
 const Drawer = ({
     onOverlayClick,
@@ -25,12 +25,13 @@ const Drawer = ({
     position = "right",
     drawerStyle = {},
     drawerClassName = "",
+    ...rest
 }: DrawerProps) => {
     const theme = useContext(ThemeContext);
 
     if (!open) return null;
     return (
-        <Wrapper className={drawerClassName} style={drawerStyle}>
+        <Wrapper className={drawerClassName} style={drawerStyle} {...rest}>
             <Overlay
                 onClick={() => {
                     if (!disableCloseOnOverlayClick) onClose();

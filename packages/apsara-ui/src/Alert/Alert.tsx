@@ -11,7 +11,7 @@ import { replaceElement } from "../FormBuilder/utils/reactNode";
 import classNames from "classnames";
 import { AlertWrapper } from "./Alert.styles";
 
-export interface AlertProps {
+export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "style" | "className"> {
     type?: "success" | "info" | "warning" | "error";
     message: React.ReactNode;
     description?: React.ReactNode;
@@ -36,15 +36,24 @@ const iconMapOutlined = {
     warning: ExclamationCircleOutlined,
 };
 
-const Alert = ({ description, message, className = "", style, showIcon = false, action, ...props }: AlertProps) => {
+const Alert = ({
+    description,
+    message,
+    className = "",
+    style,
+    showIcon = false,
+    action,
+    type: typeProp,
+    icon,
+    ...rest
+}: AlertProps) => {
     const [closed] = React.useState(false);
 
     const prefixCls = "apsara-alert";
 
     const getType = () => {
-        const { type } = props;
-        if (type !== undefined) {
-            return type;
+        if (typeProp !== undefined) {
+            return typeProp;
         }
         return "info";
     };
@@ -52,7 +61,6 @@ const Alert = ({ description, message, className = "", style, showIcon = false, 
     const type = getType();
 
     const renderIconNode = () => {
-        const { icon } = props;
         const iconType = (description ? iconMapOutlined : iconMapFilled)[type] || null;
         if (icon) {
             return replaceElement(icon, <span className={`${prefixCls}-icon`}>{icon}</span>, () => ({
@@ -77,7 +85,7 @@ const Alert = ({ description, message, className = "", style, showIcon = false, 
     );
 
     return (
-        <AlertWrapper>
+        <AlertWrapper {...rest}>
             <div data-show={!closed} className={classNames(alertClasses)} style={{ ...style }} role="alert">
                 {isShowIcon ? renderIconNode() : null}
                 <div className={`${prefixCls}-content`}>

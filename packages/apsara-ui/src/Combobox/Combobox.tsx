@@ -47,7 +47,16 @@ export const CustomTagRender = (props: CustomTagRenderProps) => {
     );
 };
 
-const Combobox = forwardRef<Select<unknown>, SelectProps>((props, ref) => {
+interface ComboboxWrapperProps {
+    "data-testid"?: string;
+    "aria-label"?: string;
+    "aria-describedby"?: string;
+    id?: string;
+}
+
+type ComboboxProps = SelectProps & ComboboxWrapperProps;
+
+const Combobox = forwardRef<Select<unknown>, ComboboxProps>((props, ref) => {
     const {
         options,
         mode,
@@ -62,6 +71,10 @@ const Combobox = forwardRef<Select<unknown>, SelectProps>((props, ref) => {
         filterOption = true,
         placeholder,
         optionFilterProp,
+        "data-testid": testId,
+        "aria-label": ariaLabel,
+        "aria-describedby": ariaDescribedBy,
+        id,
         ...restProps
     } = props;
     const [showInputIcon, setShowInputIcon] = useState(true);
@@ -100,31 +113,33 @@ const Combobox = forwardRef<Select<unknown>, SelectProps>((props, ref) => {
     };
 
     return (
-        <StyledMultiSelect
-            notFoundContent={restProps.loading ? loadingContent : notFoundContent}
-            {...restProps}
-            showInputIcon={showInputIcon || !allowClear}
-            showSearch={showSearch}
-            mode={mode}
-            allowClear={allowClear}
-            placeholder={placeholder}
-            value={value}
-            showArrow={showArrow}
-            inputIcon={inputIcon}
-            onChange={onValuesChange}
-            onSearch={onValueSearch}
-            onDropdownVisibleChange={onDropDownToogle}
-            open={open}
-            onSelect={onValueSelect}
-            onDeselect={onValueDeselect}
-            options={options}
-            filterOption={filterOption}
-            optionFilterProp={optionFilterProp || "value"}
-            animation="slide"
-            ref={ref}
-        >
-            {restProps.children}
-        </StyledMultiSelect>
+        <div data-testid={testId} aria-label={ariaLabel} aria-describedby={ariaDescribedBy} id={id}>
+            <StyledMultiSelect
+                notFoundContent={restProps.loading ? loadingContent : notFoundContent}
+                {...restProps}
+                showInputIcon={showInputIcon || !allowClear}
+                showSearch={showSearch}
+                mode={mode}
+                allowClear={allowClear}
+                placeholder={placeholder}
+                value={value}
+                showArrow={showArrow}
+                inputIcon={inputIcon}
+                onChange={onValuesChange}
+                onSearch={onValueSearch}
+                onDropdownVisibleChange={onDropDownToogle}
+                open={open}
+                onSelect={onValueSelect}
+                onDeselect={onValueDeselect}
+                options={options}
+                filterOption={filterOption}
+                optionFilterProp={optionFilterProp || "value"}
+                animation="slide"
+                ref={ref}
+            >
+                {restProps.children}
+            </StyledMultiSelect>
+        </div>
     );
 });
 

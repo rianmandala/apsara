@@ -38,10 +38,25 @@ export type RadioProps = {
     itemStyle?: styleProps;
     children?: React.ReactNode;
     id?: string;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "dir">;
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(
-    ({ defaultValue, value, items, onChange, required, orientation, dir, id = generateRandomId(), ...props }, ref) => {
+    (
+        {
+            defaultValue,
+            value,
+            items,
+            onChange,
+            required,
+            orientation,
+            dir,
+            id = generateRandomId(),
+            itemStyle,
+            children,
+            ...rest
+        },
+        ref,
+    ) => {
         return (
             <RadioGroup
                 defaultValue={defaultValue}
@@ -50,10 +65,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                 required={required}
                 orientation={orientation}
                 dir={dir}
-                className={props.className}
-                style={props.style}
                 aria-label="View density"
                 ref={ref}
+                {...rest}
             >
                 {items &&
                     items.map((item, i) => (
@@ -62,9 +76,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                                 value={item.value}
                                 disabled={item.disabled}
                                 required={item.required}
-                                {...props.itemStyle}
+                                {...itemStyle}
                                 id={`${id}${item.value}${i}`}
-                                className={`${PREFIX_CLS} ${props.className ? props.className : ""}`}
+                                className={`${PREFIX_CLS} ${rest.className ? rest.className : ""}`}
                             >
                                 <StyledIndicator />
                             </StyledRadioItem>
@@ -73,7 +87,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
                             </Label>
                         </Flex>
                     ))}
-                {!items && props.children}
+                {!items && children}
             </RadioGroup>
         );
     },

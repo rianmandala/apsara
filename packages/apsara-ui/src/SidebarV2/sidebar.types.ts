@@ -26,6 +26,7 @@ export interface NavigationSidebarList {
     className?: string;
     highlight?: SidebarHighlight;
     children?: NavigationSidebarList[];
+    'data-testid'?: string;
 }
 
 export interface LinkRenderProps {
@@ -33,7 +34,9 @@ export interface LinkRenderProps {
     props: LinkProps;
 }
 
-export interface SiderMenuProps extends NavigationSidebarList {
+export interface SiderMenuProps
+    extends NavigationSidebarList,
+        Omit<React.LiHTMLAttributes<HTMLLIElement>, keyof NavigationSidebarList | "children"> {
     activeState: string;
     linkRender?: ({ children, props }: LinkRenderProps) => ReactNode;
 }

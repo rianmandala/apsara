@@ -17,7 +17,7 @@ type CheckboxProps = {
     style?: React.CSSProperties;
     id?: string;
     ref?: Ref<HTMLButtonElement>;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "value" | "checked">;
 
 type CheckboxGroupProps = {
     defaultValue?: string[];
@@ -45,6 +45,8 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
             label,
             style,
             id = generateRandomId(),
+            className = "",
+            ...rest
         },
         ref,
     ) => {
@@ -55,7 +57,10 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
         }, [checked]);
 
         return (
-            <CheckboxWrapper className={`${prefixCls}-wrapper`}>
+            <CheckboxWrapper
+                className={`${prefixCls}-wrapper ${className}`}
+                {...(rest as React.HTMLAttributes<HTMLDivElement>)}
+            >
                 <StyledCheckbox
                     ref={ref}
                     defaultChecked={defaultChecked}

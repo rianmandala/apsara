@@ -8,7 +8,8 @@ import { Wrapper } from "./Search.styles";
 const nullFn = () => null;
 declare type SizeType = "small" | "middle" | "large" | undefined;
 
-export interface SearchProps {
+export interface SearchProps
+    extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "onFocus" | "onKeyDown" | "children" | "style"> {
     placeholder?: string;
     onChange?: (event: any) => void;
     children?: any;
@@ -41,6 +42,7 @@ const Search = ({
     iconStyle = {},
     onIconClick = nullFn,
     disabled = false,
+    ...rest
 }: SearchProps) => {
     const theme = useContext(ThemeContext);
     const iconObj = secondary
@@ -53,7 +55,7 @@ const Search = ({
     };
 
     return (
-        <Wrapper className={className} secondary={secondary}>
+        <Wrapper className={className} secondary={secondary} {...rest}>
             <Input
                 style={style}
                 disabled={disabled}

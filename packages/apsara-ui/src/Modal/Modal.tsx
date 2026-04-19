@@ -4,7 +4,7 @@ import { Overlay, Content, Title, HeadingWrapper, CloseDiv } from "./Modal.style
 import { Cross2Icon } from "@radix-ui/react-icons";
 import * as Dialog from "@radix-ui/react-dialog";
 
-interface ModalProps {
+interface ModalProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
     children?: React.ReactNode;
     heading: string;
     closable?: boolean;
@@ -22,6 +22,7 @@ const Modal = ({
     open = false,
     width = "50vw",
     maskStyle = { background: "rgba(0 0 0 / 0.5);" },
+    ...rest
 }: ModalProps) => {
     return (
         <Dialog.Root
@@ -36,7 +37,7 @@ const Modal = ({
         >
             <Dialog.Portal>
                 <Overlay style={maskStyle}>
-                    <Content style={{ width: `${width}` }}>
+                    <Content style={{ width: `${width}` }} {...rest}>
                         <HeadingWrapper>
                             <Title>
                                 <div>{heading}</div>
