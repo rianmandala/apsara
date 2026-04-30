@@ -15,7 +15,6 @@ import {
 } from "./Popover.styles";
 
 interface ButtonPopoverContentProps {
-    style: React.CSSProperties;
     title: string;
     message?: string;
     content?: React.ReactNode | null;
@@ -69,6 +68,7 @@ export const PopoverContent = ({
 
 interface ButtonConfirmationPopover extends ButtonPopoverContentProps {
     children?: React.ReactNode;
+    style: React.CSSProperties;
 }
 
 function ConfirmationPopover({
