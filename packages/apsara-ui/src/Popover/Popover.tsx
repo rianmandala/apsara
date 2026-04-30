@@ -15,6 +15,7 @@ import {
 } from "./Popover.styles";
 
 interface ButtonPopoverContentProps {
+    style: React.CSSProperties;
     title: string;
     message?: string;
     content?: React.ReactNode | null;
@@ -81,6 +82,7 @@ function ConfirmationPopover({
     okBtnProps,
     cancelBtnProps,
     children,
+    style,
 }: ButtonConfirmationPopover) {
     const [internalOpen, setInternalOpen] = useState(false);
     const controlled = typeof open !== "boolean";
@@ -123,7 +125,7 @@ function ConfirmationPopover({
                 <span aria-label="Update dimensions">{children}</span>
             </PopoverTrigger>
             <PopoverPrimitive.Portal>
-                <StyledContent className="apsara-popover-content" side="bottom" align="end">
+                <StyledContent style={style} className="apsara-popover-content" side="bottom" align="end">
                     <PopoverContent
                         title={title}
                         message={message}
