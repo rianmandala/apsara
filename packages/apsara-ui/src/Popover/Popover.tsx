@@ -68,7 +68,7 @@ export const PopoverContent = ({
 
 interface ButtonConfirmationPopover extends ButtonPopoverContentProps {
     children?: React.ReactNode;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
 }
 
 function ConfirmationPopover({
