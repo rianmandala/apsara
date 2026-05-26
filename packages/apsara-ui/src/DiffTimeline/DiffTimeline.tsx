@@ -108,11 +108,11 @@ const DiffTimelineBlock = ({ timelineBlockData }: any) => {
                             </span>
                         </CollapsibleHeader>
                         <CollapsibleContent>
-                            {timelineBlockData.renderDiff ?
+                            {timelineBlockData.renderDiff ? (
                                 timelineBlockData.renderDiff()
-                                :
-                                <DiffTable diff={timelineBlockData.diff} />}
-                            
+                            ) : (
+                                <DiffTable diff={timelineBlockData.diff} />
+                            )}
                         </CollapsibleContent>
                     </Collapsible.Root>
                 )}

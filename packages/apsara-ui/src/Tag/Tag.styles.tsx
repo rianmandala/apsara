@@ -8,7 +8,7 @@ const fontSizeMap: Record<TagSize, string> = {
     large: "14px",
 };
 
-export const StyledTag = styled("div") <{
+export const StyledTag = styled("div")<{
     type: "round" | "rect";
     color: string;
     closable: boolean;

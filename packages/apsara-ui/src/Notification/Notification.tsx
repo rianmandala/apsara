@@ -24,11 +24,12 @@ export interface Notification {
 }
 
 export interface Notifier {
-    showNotification: (notification: Notification) => void;
-    showSuccess: (title: ReactNode, content?: ReactNode, duration?: number) => void;
-    showError: (title: ReactNode, content?: ReactNode, duration?: number) => void;
-    showWarning: (title: ReactNode, content?: ReactNode, duration?: number) => void;
+    showNotification: (notification: Notification) => string;
+    showSuccess: (title: ReactNode, content?: ReactNode, duration?: number) => string;
+    showError: (title: ReactNode, content?: ReactNode, duration?: number) => string;
+    showWarning: (title: ReactNode, content?: ReactNode, duration?: number) => string;
     showAPIError: (error: unknown | unknown[]) => void;
+    closeNotification: (id: string) => void;
 }
 
 export const useNotification = () => {
@@ -249,59 +250,74 @@ export const NotificationProvider = ({ children }: any) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
     const showNotification = useCallback(
-        (notification: Notification) => {
-            setNotifications((prevNotifications) => [...prevNotifications, { ...notification, id: uuid() }]);
+        (notification: Notification): string => {
+            const id = uuid();
+            setNotifications((prevNotifications) => [...prevNotifications, { ...notification, id }]);
+            return id;
         },
         [setNotifications],
     );
 
     const showSuccess = useCallback(
-        (title: ReactNode, content?: ReactNode, duration?: number) => {
+        (title: ReactNode, content?: ReactNode, duration?: number): string => {
+            const id = uuid();
             setNotifications((prevNotifications) => [
                 ...prevNotifications,
                 {
                     title: title,
                     content: content,
-                    id: uuid(),
+                    id,
                     duration: duration ?? 3000,
                     showCopy: false,
                     icon: <Icon name="checkcircle" color="green" size={32} />,
                 },
             ]);
+            return id;
         },
         [setNotifications],
     );
 
     const showError = useCallback(
-        (title: ReactNode, content?: ReactNode, duration?: number) => {
+        (title: ReactNode, content?: ReactNode, duration?: number): string => {
+            const id = uuid();
             setNotifications((prevNotifications) => [
                 ...prevNotifications,
                 {
                     title: title,
                     content: content,
-                    id: uuid(),
+                    id,
                     duration: duration ?? 6000,
                     showCopy: true,
                     icon: <Icon name="error" color="red" size={32} />,
                 },
             ]);
+            return id;
         },
         [setNotifications],
     );
 
     const showWarning = useCallback(
-        (title: ReactNode, content?: ReactNode, duration?: number) => {
+        (title: ReactNode, content?: ReactNode, duration?: number): string => {
+            const id = uuid();
             setNotifications((prevNotifications) => [
                 ...prevNotifications,
                 {
                     title: title,
                     content: content,
-                    id: uuid(),
+                    id,
                     duration: duration ?? 3000,
                     showCopy: false,
                     icon: <Icon name="error" color="orange" size={32} />,
                 },
             ]);
+            return id;
+        },
+        [setNotifications],
+    );
+
+    const closeNotification = useCallback(
+        (id: string) => {
+            setNotifications((prev) => prev.filter((n) => n.id !== id));
         },
         [setNotifications],
     );
@@ -346,8 +362,9 @@ export const NotificationProvider = ({ children }: any) => {
             showError,
             showWarning,
             showAPIError,
+            closeNotification,
         }),
-        [showNotification, showSuccess, showError, showWarning, showAPIError],
+        [showNotification, showSuccess, showError, showWarning, showAPIError, closeNotification],
     );
 
     return (
@@ -381,6 +398,9 @@ const NotificationContext = createContext<Notifier>({
         throw new Error("NotificationProvider is not initialized");
     },
     showAPIError: () => {
+        throw new Error("NotificationProvider is not initialized");
+    },
+    closeNotification: () => {
         throw new Error("NotificationProvider is not initialized");
     },
 });

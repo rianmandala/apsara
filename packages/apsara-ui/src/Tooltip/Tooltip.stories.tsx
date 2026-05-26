@@ -27,13 +27,17 @@ export const ControlledState = () => {
     const [open, setOpen] = React.useState(true);
 
     return (
-        // @ts-ignore
-        <Tooltip title={(
-            <span>
-                This is tooltip content
-                <span style={{ marginLeft: '8px', cursor: 'pointer'}} onClick={() => setOpen(false)}>X</span>
-            </span>
-        )} open={open}>
+        <Tooltip
+            title={
+                <span>
+                    This is tooltip content
+                    <span style={{ marginLeft: "8px", cursor: "pointer" }} onClick={() => setOpen(false)}>
+                        X
+                    </span>
+                </span>
+            }
+            open={open}
+        >
             <span>Content Wrapped by Tooltip</span>
         </Tooltip>
     );

@@ -26,7 +26,7 @@ export interface NavigationSidebarList {
     className?: string;
     highlight?: SidebarHighlight;
     children?: NavigationSidebarList[];
-    'data-testid'?: string;
+    "data-testid"?: string;
 }
 
 export interface LinkRenderProps {

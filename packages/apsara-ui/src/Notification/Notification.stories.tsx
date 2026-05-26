@@ -18,7 +18,9 @@ const buildFetchAPIError = async (url: string, includeMessage: boolean): Promise
     let data: Record<string, unknown> = {};
     try {
         data = await response.json();
-    } catch {}
+    } catch (_e) {
+        // ignore JSON parse errors — data stays as empty object
+    }
 
     const err = new Error(`Request failed with status code ${response.status}`) as Error & Record<string, unknown>;
     err.response = {
